@@ -44,7 +44,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           
           # SSH経由でMinikubeへデプロイ
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no CentUser10@<あなたのCentOSのIPアドレス> "
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no CentUser10@192.168.56.105"
             minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
             kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
             kubectl apply -f k8s-deployment.yml
