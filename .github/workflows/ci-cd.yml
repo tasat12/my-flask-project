@@ -66,5 +66,5 @@ jobs:
 
       - name: Deploy to Minikube
         run: |
-        kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase  
-        kubectl apply -f k8s-deployment.yml
+          kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase  
+          kubectl apply -f k8s-deployment.yml
