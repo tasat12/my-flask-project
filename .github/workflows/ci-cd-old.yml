@@ -35,6 +35,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      #元のMinikubeとKubectlのインストール手順
+      #- name: Install Minikube and kubectl
+      #  run: |
+      #    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+      #    sudo install minikube-linux-amd64 /usr/local/bin/minikube
+      #    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      #    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+      #GitHub Actionsのランナー上にMinikubeをインストールする代わりに、
+      #既存のCentOS上のMinikubeにデプロイします。
+      # MinikubeとKubectlをGitHub Actionsでセットアップ
+      #- name: Set up Minikube and Kubectl
+      #  uses: manusa/actions-setup-minikube@v2.6.0
+      #  with:
+      #    minikube-version: 'latest'
+      #    kubectl-version: 'latest'
+      #    driver: docker
+
+      # 元のMinikube起動
+      #- name: Start Minikube
+      #  run: minikube start --driver=docker
+
       # SSHを使ってCentOS上のMinikubeに接続し、デプロイを実行します
       - name: Deploy to Minikube via SSH
         run: |
@@ -49,3 +71,10 @@ jobs:
             kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
             kubectl apply -f k8s-deployment.yml
           "
+      #- name: Load image to Minikube
+      #  run: minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
+
+      #- name: Deploy to Minikube
+      #  run: |
+      #    kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase  
+      #    kubectl apply -f k8s-deployment.yml
