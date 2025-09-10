@@ -37,7 +37,7 @@ jobs:
 
       # SSHを使ってCentOS上のMinikubeに接続し、デプロイを実行します
       - name: Deploy to Minikube via SSH
-        run: |  
+        run: |
           # SSH接続に必要なキーをセットアップ
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -46,6 +46,5 @@ jobs:
           # SSH経由でMinikubeへデプロイ
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no CentUser10@192.168.56.105 "
             minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
-            kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
             kubectl apply -f k8s-deployment.yml
           "
