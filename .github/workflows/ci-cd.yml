@@ -48,8 +48,8 @@ jobs:
       - name: Set up Minikube and Kubectl
         uses: manusa/actions-setup-minikube@v2.6.0
         with:
-          minikube version: 'latest'
-          kubectl version: 'latest'
+          minikube-version: 'latest'
+          kubectl-version: 'latest'
           driver: docker
 
       # 元のMinikube起動
