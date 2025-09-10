@@ -37,7 +37,7 @@ jobs:
 
       # SSHを使ってCentOS上のMinikubeに接続し、デプロイを実行します
       - name: Deploy to Minikube via SSH
-        run: |
+        run: |  
           # SSH接続に必要なキーをセットアップ
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
