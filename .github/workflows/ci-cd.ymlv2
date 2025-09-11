@@ -1,0 +1,14 @@
+deploy-to-minikube:
+  runs-on: self-hosted # ここをセルフホストランナーのラベルに変更
+  needs: build-and-test
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Load image to Minikube
+      run: minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
+
+    - name: Deploy to Minikube
+      run: |
+        kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
+        kubectl apply -f k8s-deployment.yml

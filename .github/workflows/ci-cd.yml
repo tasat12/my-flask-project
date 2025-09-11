@@ -1,14 +1,58 @@
-deploy-to-minikube:
-  runs-on: self-hosted # ここをセルフホストランナーのラベルに変更
-  needs: build-and-test
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+name: CI/CD Pipeline
 
-    - name: Load image to Minikube
-      run: minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
+on:
+  push:
+    branches:
+      - main
 
-    - name: Deploy to Minikube
-      run: |
-        kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
-        kubectl apply -f k8s-deployment.yml
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./app
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
+
+  deploy-to-minikube:
+    runs-on: self-hosted  # ①ここを変更しました
+    needs: build-and-test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Minikube and kubectl on self-hosted runner # ②ここを追加しました
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo install minikube-linux-amd64 /usr/local/bin/minikube
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+      - name: Start Minikube # ③ここを追加しました
+        run: minikube start --driver=docker
+        
+      - name: Set Docker context to Minikube # ④ここを追加しました
+        run: minikube -p minikube docker-env --shell bash | eval "$(cat -)"
+
+      - name: Load image to Minikube
+        run: minikube image load ${{ secrets.DOCKER_HUB_USERNAME }}/my-flask-app:latest
+
+      - name: Deploy to Minikube
+        run: |
+          kubectl create secret generic postgres-secret --from-literal=POSTGRES_USER=user --from-literal=POSTGRES_PASSWORD=password --from-literal=POSTGRES_DB=mydatabase
+          kubectl apply -f k8s-deployment.yml
