@@ -22,7 +22,7 @@ def hello_world():
     except Exception as e:
         db_status = f'接続失敗: {e}'
 
-    return f'Hello, Docker! The database is running at {db_host}. DB接続ステータス: {db_status}'
+    return f'Hello, Docker! The database is running at {db_host}. DB接続ステータス: {db_status}しました'
 
 
 if  __name__ == '__main__':
